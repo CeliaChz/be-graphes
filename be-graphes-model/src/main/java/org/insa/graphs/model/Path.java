@@ -197,24 +197,35 @@ public class Path {
      * </ul>
      * 
      * @return true if the path is valid, false otherwise.
-     * 
-     * @deprecated Need to be implemented.
      */
     public boolean isValid() {
-        // TODO:
-        return false;
+        boolean result = false;
+        //graph is empty
+        if (this.isEmpty()) {
+        	result = true;
+        }
+        //graph only has 1 node
+        else if (this.size()==1) {
+        	result = true ;
+        }
+        else {
+        	//vérifier que le premier arc a bien pour origine l'origine du path
+        	//et que pour tous les arcs la destination du premier arc est l'origine du deuxième
+        }
+        return result;
     }
 
     /**
      * Compute the length of this path (in meters).
      * 
      * @return Total length of the path (in meters).
-     * 
-     * @deprecated Need to be implemented.
      */
     public float getLength() {
-        // TODO:
-        return 0;
+    	float length = 0;
+    	for (Arc arc : this.arcs) {
+    	    length += arc.getLength() ; 
+    	}
+        return length;
     }
 
     /**
@@ -224,12 +235,13 @@ public class Path {
      * 
      * @return Time (in seconds) required to travel this path at the given speed (in
      *         kilometers-per-hour).
-     * 
-     * @deprecated Need to be implemented.
      */
     public double getTravelTime(double speed) {
-        // TODO:
-        return 0;
+        double time = 0;
+        for (Arc arc : this.arcs) {
+    	    time += arc.getTravelTime(speed) ; 
+    	}
+        return time;
     }
 
     /**
@@ -237,12 +249,13 @@ public class Path {
      * on every arc.
      * 
      * @return Minimum travel time to travel this path (in seconds).
-     * 
-     * @deprecated Need to be implemented.
      */
     public double getMinimumTravelTime() {
-        // TODO:
-        return 0;
+    	 double minTime = 0;
+         for (Arc arc : this.arcs) {
+     	    minTime += arc.getMinimumTravelTime() ; 
+     	}
+         return minTime;
     }
 
 }
