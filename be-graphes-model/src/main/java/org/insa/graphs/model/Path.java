@@ -29,13 +29,38 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+        //case 1: the graph only has 1 node
+        if (nodes.size()==1) {
+        	return new Path(graph, nodes.get(0));
+        }
+        
+        else {
+        	for (int i = 0 ; i < nodes.size()-1 ; i++) {
+        		boolean found = false ;
+        		double min = Double.POSITIVE_INFINITY ; //we set the min to infinity to make sure to find something smaller
+        		Arc arcMin = null;
+        		if (nodes.get(i).getSuccessors().size() >= 1) {
+        			for (Arc arc : nodes.get(i).getSuccessors()) {
+        				if (arc.getDestination() == nodes.get(i+1)) {
+        					if (arc.getMinimumTravelTime() < min) {
+        						//we found a fastest path, we update our min and arcMin
+        						min = arc.getMinimumTravelTime();
+        						arcMin = arc ;
+        					}
+        					found = true ;
+        				}
+        			}
+        			if (found == false) {
+        				throw new IllegalArgumentException("Two consecutive nodes in the list are not connected in the graph.");
+        			}
+        			arcs.add(arcMin);
+        		}
+        	}
+        }        
         return new Path(graph, arcs);
     }
 
@@ -50,13 +75,38 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+      //case 1: the graph only has 1 node
+        if (nodes.size()==1) {
+        	return new Path(graph, nodes.get(0));
+        }
+        
+        else {
+        	for (int i = 0 ; i < nodes.size()-1 ; i++) {
+        		boolean found = false ;
+        		double min = Double.POSITIVE_INFINITY ; //we set the min to infinity to make sure we'll find something smaller
+        		Arc arcMin = null;
+        		if (nodes.get(i).getSuccessors().size() >= 1) {
+        			for (Arc arc : nodes.get(i).getSuccessors()) {
+        				if (arc.getDestination() == nodes.get(i+1)) {
+        					if (arc.getLength() < min) {
+        						//we found a fastest path, we update our min and arcMin
+        						min = arc.getLength();
+        						arcMin = arc ;
+        					}
+        					found = true ;
+        				}
+        			}
+        			if (found == false) {
+        				throw new IllegalArgumentException("Two consecutive nodes in the list are not connected in the graph.");
+        			}
+        			arcs.add(arcMin);
+        		}
+        	}
+        }        
         return new Path(graph, arcs);
     }
 
@@ -78,8 +128,7 @@ public class Path {
         final String mapId = paths[0].getGraph().getMapId();
         for (int i = 1; i < paths.length; ++i) {
             if (!paths[i].getGraph().getMapId().equals(mapId)) {
-                throw new IllegalArgumentException(
-                        "Cannot concatenate paths from different graphs.");
+                throw new IllegalArgumentException("Cannot concatenate paths from different graphs.");
             }
         }
         ArrayList<Arc> arcs = new ArrayList<>();
@@ -88,8 +137,7 @@ public class Path {
         }
         Path path = new Path(paths[0].getGraph(), arcs);
         if (!path.isValid()) {
-            throw new IllegalArgumentException(
-                    "Cannot concatenate paths that do not form a single path.");
+            throw new IllegalArgumentException("Cannot concatenate paths that do not form a single path.");
         }
         return path;
     }
@@ -199,20 +247,25 @@ public class Path {
      * @return true if the path is valid, false otherwise.
      */
     public boolean isValid() {
-        boolean result = false;
-        //graph is empty
-        if (this.isEmpty()) {
-        	result = true;
-        }
-        //graph only has 1 node
-        else if (this.size()==1) {
-        	result = true ;
+        //graph is empty or graph only has 1 node
+        if (this.isEmpty() || this.size()==1) {
+        	return true;
         }
         else {
         	//vérifier que le premier arc a bien pour origine l'origine du path
         	//et que pour tous les arcs la destination du premier arc est l'origine du deuxième
+        	if (this.arcs.get(0).getOrigin()==this.getOrigin()) {
+        		for (int i=0; i < this.arcs.size()-1; i++) {
+        			if (this.arcs.get(i).getDestination() != this.arcs.get(i+1).getOrigin()) {
+        				return false;
+        			}
+        		}
+        		return true;
+        	}
+        	else {
+        		return false ;
+        	}
         }
-        return result;
     }
 
     /**
