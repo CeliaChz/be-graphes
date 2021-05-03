@@ -135,6 +135,33 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         this.percolateUp(index);
     }
 
+    
+    @Override
+    public void remove(E x) throws ElementNotFoundException {    	
+        if (isEmpty()) {
+        	//the array is empty -> exception
+        	throw new ElementNotFoundException(x);
+        }
+               	
+        //we look for the element x
+        int index = this.array.indexOf(x);
+        if (index == -1 || index >= this.currentSize) {
+        	//element not found -> exception
+        	throw new ElementNotFoundException(x);
+        }
+        	
+        //we found the element 
+	    //we update the size and the array
+	    this.currentSize -- ;
+	    this.arraySet(index, this.array.get(this.currentSize));
+	    for (int i = 0; i < this.currentSize ; i++) {
+	    	percolateDown(i);
+	    }
+    }
+    
+    
+    //version avec un for mais qui fonctionne
+    /*
     @Override
     public void remove(E x) throws ElementNotFoundException {
     	boolean found = false ;
@@ -143,28 +170,26 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
         	//the array is empty -> exception
         	throw new ElementNotFoundException(x);
         }
-        
-        else {       	
-        	//we go through all the array 
-        	for (int i = 0; i < this.currentSize; i++) {
-        		if (this.array.get(i) == x) {
-        			//we found the element x
-        			found = true ;
-        			//we update the size and the array
-        			this.currentSize -- ;
-        			this.array.set(i, this.array.get(this.currentSize));
-        			for (int j = 0; j < this.currentSize ; j++) {
-        				percolateDown(j);
-        			}
-    			}
-        	}
-        	
-        	if (!found) {
-        		//we did not find the element x -> exception 
-        		throw new ElementNotFoundException(x);
-        	}
+               	
+        //we go through all the array 
+        for (int i = 0; i < this.currentSize; i++) {
+        	if (this.array.get(i) == x) {
+        		//we found the element x
+        		found = true ;
+        		//we update the size and the array
+        		this.currentSize -- ;
+        		this.array.set(i, this.array.get(this.currentSize));
+        		for (int j = 0; j < this.currentSize ; j++) {
+        			percolateDown(j);
+        		}
+    		}
         }
-    }
+        if (!found) {
+        	//we did not find the element x -> exception 
+        	throw new ElementNotFoundException(x);
+        }
+  	}
+  */
 
     @Override
     public E findMin() throws EmptyPriorityQueueException {
