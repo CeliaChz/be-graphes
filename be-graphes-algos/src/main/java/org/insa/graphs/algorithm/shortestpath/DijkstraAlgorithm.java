@@ -2,15 +2,11 @@ package org.insa.graphs.algorithm.shortestpath;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.algorithm.utils.*;
-
 import org.insa.graphs.model.*;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
-
-	private Label[] Labels;
 	
 	private BinaryHeap<Label> tas = new BinaryHeap<Label>();
 	
@@ -20,12 +16,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
     @Override
     protected ShortestPathSolution doRun() {
-        final ShortestPathData data = getInputData();
+        ShortestPathData data = getInputData();
         ShortestPathSolution solution = null;
         Graph graph = data.getGraph();
         
         //initialisation du tableau de labels 
         //on ajoute un label pour chaque node
+        Label[] Labels = new Label[graph.size()];
         for (int i = 0 ; i < graph.size(); i++) {
         	Labels[i] = new Label(i, false, Double.POSITIVE_INFINITY, null) ;
         }
@@ -40,7 +37,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         while (!Labels[data.getDestination().getId()].getMarque()) {
         	Label label_x ;
         	try {
-        		label_x = tas.findMin();
+        		label_x = tas.deleteMin();
         	}
         	catch (EmptyPriorityQueueException e) {
         		break ;
@@ -59,6 +56,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	else {
         		//on parcourt les successeurs de x
             	for (Arc a : node_x.getSuccessors()) {
+            		if (data.isAllowed(a)) {
             		Node node_y = a.getDestination();
             		int node_y_id = node_y.getId();
             		Label label_y = Labels[node_y_id];
@@ -85,6 +83,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             			}
             		}
             	}
+            }
         		
         	}
         	
@@ -104,14 +103,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 arcs.add(arc);
                 arc = Labels[arc.getOrigin().getId()].getPere();
             }
+
+            // Reverse the path...
+            Collections.reverse(arcs);
+
+            // Create the final solution.
+            solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
         }
         
-
-        // Reverse the path...
-        Collections.reverse(arcs);
-
-        // Create the final solution.
-        solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
         return solution;
     }
 }
