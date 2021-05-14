@@ -47,8 +47,42 @@ public class Label implements Comparable<Label>{
 		return this.sommet_courant;
 	}
 	
+	public double getTotalCost() {
+		return this.cout ;
+	}
+	
+	public double getEstimatedCost() {
+		return 0;
+	}
+	
+	
+	//On ordonne les noeuds selon l'ordre (coût depuis l'origine + coût estimé à la destination) croissant
+	//càs coût total croissant
+	//En cas d'égalité, le sommet ayant le plus petit coût estimé à la destination sera le premier
 	public int compareTo(Label other) {
-		return Double.compare(getCost(), other.getCost());
+		//le cout total de l'autre noeud est plus grand => return -1
+		if (this.getTotalCost() < other.getTotalCost()) {
+			return -1 ;
+		}
+		//le cout total du noeud et de l'autre noeud sont égaux
+		else if (this.getTotalCost() == other.getTotalCost()) {
+			//l'autre noeud a un cout estimé plus grand => -1
+			if (this.getEstimatedCost() < other.getEstimatedCost()) {
+				return -1;
+			}
+			//ils ont le même cout estimé => 0
+			else if (this.getEstimatedCost() == other.getEstimatedCost()) {
+				return 0 ;
+			}
+			//l'autre noeud a un cout estimé plus petit => 1
+			else {
+				return 1;
+			}
+		}
+		//le cout total de l'autre noeud est plus petit => return 1
+		else {
+			return 1 ;
+		}
 	}
 	
 }

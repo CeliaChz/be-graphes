@@ -14,18 +14,27 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         super(data);
     }
 
+    //nécessaire pour implémenter A* ensuite 
+    protected void Initialisation(Label[] Labels, Graph graph, ShortestPathData data) {
+    	 for (int i = 0 ; i < graph.size(); i++) {
+         	Labels[i] = new Label(i, false, Double.POSITIVE_INFINITY, null) ;
+         }
+    }
+    
     @Override
     protected ShortestPathSolution doRun() {
         ShortestPathData data = getInputData();
         ShortestPathSolution solution = null;
         Graph graph = data.getGraph();
         
+        //Variables pour la partie vérification
+        double ancien_cout = 0;
+        int nb_explores = 0 ;
+        
         //initialisation du tableau de labels 
         //on ajoute un label pour chaque node
         Label[] Labels = new Label[graph.size()];
-        for (int i = 0 ; i < graph.size(); i++) {
-        	Labels[i] = new Label(i, false, Double.POSITIVE_INFINITY, null) ;
-        }
+        Initialisation(Labels, graph, data);
         
         //on met le cout du sommet d'origine à 0
         Labels[data.getOrigin().getId()].setCost(0);
@@ -54,6 +63,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	}
         	
         	else {
+        		//Vérification que les coûts des labels marqués sont croissants
+        		if(ancien_cout > label_x.getCost()) { 
+            		System.out.println("Les coûts des Labels marqués ne sont pas croissants.");
+            	}
+            	ancien_cout = label_x.getCost();
+            	
         		//on parcourt les successeurs de x
             	for (Arc a : node_x.getSuccessors()) {
             		if (data.isAllowed(a)) {
@@ -79,16 +94,18 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 				Labels[node_y_id].setPere(a);
                 				this.notifyNodeReached(node_y);
             				}
-            				
+            				nb_explores ++ ;
             			}
             		}
+            		
             	}
             }
-        		
-        	}
-        	
-        	
+            System.out.println("Le nombre de successeurs explorés est : " + nb_explores + " pour " + node_x.getNumberOfSuccessors() + " successeur(s).");
+        	nb_explores = 0;	
         }
+        	
+        	
+      }
         
         ArrayList<Arc> arcs = new ArrayList<>();
         Node destination = data.getDestination();
@@ -110,6 +127,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             // Create the final solution.
             solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
         }
+        
         
         return solution;
     }
