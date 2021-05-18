@@ -87,6 +87,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             					tas.insert(label_y);
             					//on màj son père
                 				Labels[node_y_id].setPere(a);
+                				
             				}
             				else {
             					Labels[node_y_id].setCost(new_cost);
@@ -95,6 +96,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 				this.notifyNodeReached(node_y);
             				}
             				nb_explores ++ ;
+            				System.out.println("Le tas est encore valide : " + tas.isValid());
             			}
             		}
             		
@@ -127,8 +129,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             // Create the final solution.
             solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
         }
-        
-        
+               
         return solution;
     }
 }

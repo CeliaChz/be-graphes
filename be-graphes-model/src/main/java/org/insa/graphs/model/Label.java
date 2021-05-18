@@ -57,7 +57,7 @@ public class Label implements Comparable<Label>{
 	
 	
 	//On ordonne les noeuds selon l'ordre (coût depuis l'origine + coût estimé à la destination) croissant
-	//càs coût total croissant
+	//càd coût total croissant
 	//En cas d'égalité, le sommet ayant le plus petit coût estimé à la destination sera le premier
 	public int compareTo(Label other) {
 		//le cout total de l'autre noeud est plus grand => return -1
