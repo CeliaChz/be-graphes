@@ -28,5 +28,6 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 	        	Labels[i] = new LabelStar(i, false, Double.POSITIVE_INFINITY, null, distance) ;
 	        } 
     	}
+    	
    }
 }

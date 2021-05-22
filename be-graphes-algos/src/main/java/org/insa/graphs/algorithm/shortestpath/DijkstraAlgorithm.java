@@ -8,8 +8,6 @@ import org.insa.graphs.model.*;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	
-	private BinaryHeap<Label> tas = new BinaryHeap<Label>();
-	
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
@@ -23,7 +21,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     
     @Override
     protected ShortestPathSolution doRun() {
-        ShortestPathData data = getInputData();
+    	final ShortestPathData data = getInputData();
         ShortestPathSolution solution = null;
         Graph graph = data.getGraph();
         
@@ -34,11 +32,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         //initialisation du tableau de labels 
         //on ajoute un label pour chaque node
         Label[] Labels = new Label[graph.size()];
-        Initialisation(Labels, graph, data);
+        this.Initialisation(Labels, graph, data);
         
         //on met le cout du sommet d'origine à 0
         Labels[data.getOrigin().getId()].setCost(0);
         //on ajoute ce sommet au tas 
+        BinaryHeap<Label> tas = new BinaryHeap<Label>();
         tas.insert(Labels[data.getOrigin().getId()]);
         this.notifyOriginProcessed(data.getOrigin());
                
@@ -46,7 +45,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         while (!Labels[data.getDestination().getId()].getMarque()) {
         	Label label_x ;
         	try {
-        		label_x = tas.deleteMin();
+        		label_x = tas.findMin();
         	}
         	catch (EmptyPriorityQueueException e) {
         		break ;
@@ -64,12 +63,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	
         	else {
         		//Vérification que les coûts des labels marqués sont croissants
-        		if(ancien_cout > label_x.getCost()) { 
-            		System.out.println("Les coûts des Labels marqués ne sont pas croissants.");
+        		if(ancien_cout > label_x.getTotalCost()) { 
+            		//System.out.println("Les coûts des Labels marqués ne sont pas croissants.");
             	}
-            	ancien_cout = label_x.getCost();
+            	ancien_cout = label_x.getTotalCost();
+            	tas.remove(Labels[id_x]);
             	
         		//on parcourt les successeurs de x
+            	nb_explores ++ ;
             	for (Arc a : node_x.getSuccessors()) {
             		if (data.isAllowed(a)) {
             		Node node_y = a.getDestination();
@@ -77,7 +78,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             		Label label_y = Labels[node_y_id];
             		if (!label_y.getMarque()) {
             			//si ils ne sont pas déjà marqués, on calcule le nouveau cout
-            			double new_cost = Double.min(label_y.getCost(), label_x.getCost()+data.getCost(a));
+            			double new_cost = Double.min(label_y.getCost(), label_x.getCost()+ data.getCost(a));
             			if (new_cost < label_y.getCost()) {
             				//si le nouveau cout est différent de l'ancien on le màj
             				if (Labels[node_y_id].getCost()!=Double.POSITIVE_INFINITY) {
@@ -95,29 +96,28 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 				Labels[node_y_id].setPere(a);
                 				this.notifyNodeReached(node_y);
             				}
-            				nb_explores ++ ;
-            				System.out.println("Le tas est encore valide : " + tas.isValid());
             			}
             		}
             		
+
+            		
             	}
             }
-            System.out.println("Le nombre de successeurs explorés est : " + nb_explores + " pour " + node_x.getNumberOfSuccessors() + " successeur(s).");
-        	nb_explores = 0;	
+         //System.out.println("Le tas est encore valide : " + tas.isValid());
         }
-        	
-        	
-      }
-        
+        }
+               
         ArrayList<Arc> arcs = new ArrayList<>();
         Node destination = data.getDestination();
         Label Labels_dest = Labels[destination.getId()];
         Arc arc = Labels_dest.getPere();
         
+        double longueurDijkstra = -1 ;
         if (arc==null) {
         	solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         else {
+        	longueurDijkstra =  Labels[data.getDestination().getId()].getTotalCost();
         	while (arc != null) {
                 arcs.add(arc);
                 arc = Labels[arc.getOrigin().getId()].getPere();
@@ -128,8 +128,26 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
             // Create the final solution.
             solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+            
+            Path path = new Path(graph, arcs);
+            
+            //on vérifie que le chemin est valide avec la classe path
+            System.out.println("Le chemin est valide : " + solution.getPath().isValid());
+            //comparaison de la longueur de la solution trouvée par l'algorithme avec celle de path
+            //on convertit les deux longueurs en entiers car elles utilisent des arrondis différents
+            System.out.println("La longueur avec la classe Path est la même que celle de l'algorithme : " + ((int)longueurDijkstra==(int)path.getLength()));
+    		System.out.println(path.getLength());
+    		System.out.println(longueurDijkstra);
+           
         }
-               
+         
+        //on vérifie que le tas est encore valide
+        //(seulement à la fin car perte de performance sinon)
+        System.out.println("Le tas est encore valide : " + tas.isValid());
+        
+        //affichage du nombre de nodes explorés
+        System.out.println("Le nombre de node explorés est : " + nb_explores + " pour " + data.getGraph().size() + " node(s).");	
+       
         return solution;
     }
 }
