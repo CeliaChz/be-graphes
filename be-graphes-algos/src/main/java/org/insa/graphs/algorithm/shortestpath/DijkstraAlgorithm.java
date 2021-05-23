@@ -36,13 +36,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         //on met le cout du sommet d'origine à 0
         Labels[data.getOrigin().getId()].setCost(0);
+        Labels[data.getOrigin().getId()].setMarque(true);
         //on ajoute ce sommet au tas 
         BinaryHeap<Label> tas = new BinaryHeap<Label>();
         tas.insert(Labels[data.getOrigin().getId()]);
         this.notifyOriginProcessed(data.getOrigin());
                
         //tant qu'il existe des sommets non marqués 
-        while (!Labels[data.getDestination().getId()].getMarque()) {
+        while (!Labels[data.getDestination().getId()].getMarque()&&(!tas.isEmpty())) {
         	Label label_x ;
         	try {
         		label_x = tas.findMin();
@@ -63,9 +64,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	
         	else {
         		//Vérification que les coûts des labels marqués sont croissants
-        		if(ancien_cout > label_x.getTotalCost()) { 
+        		/*if(ancien_cout > label_x.getTotalCost()) { 
             		System.out.println("Les coûts des Labels marqués ne sont pas croissants.");
-            	}
+            	}*/
             	ancien_cout = label_x.getTotalCost();
             	tas.remove(label_x);
             	
@@ -135,10 +136,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             System.out.println("Le chemin est valide : " + solution.getPath().isValid());
             //comparaison de la longueur de la solution trouvée par l'algorithme avec celle de path
             //on convertit les deux longueurs en entiers car elles utilisent des arrondis différents
-            System.out.println("La longueur avec la classe Path est la même que celle de l'algorithme : " + ((int)longueurDijkstra==(int)path.getLength()));
-    		/*System.out.println(path.getLength());
-    		System.out.println(longueurDijkstra);*/
-           
+            if ((int)longueurDijkstra==(int)path.getLength()) {
+            	System.out.println("La longueur avec la classe Path est la même que celle de l'algorithme" );
+            }
         }
          
         //on vérifie que le tas est encore valide
