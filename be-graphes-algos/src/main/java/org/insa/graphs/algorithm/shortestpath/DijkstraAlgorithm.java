@@ -64,10 +64,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	else {
         		//Vérification que les coûts des labels marqués sont croissants
         		if(ancien_cout > label_x.getTotalCost()) { 
-            		//System.out.println("Les coûts des Labels marqués ne sont pas croissants.");
+            		System.out.println("Les coûts des Labels marqués ne sont pas croissants.");
             	}
             	ancien_cout = label_x.getTotalCost();
-            	tas.remove(Labels[id_x]);
+            	tas.remove(label_x);
             	
         		//on parcourt les successeurs de x
             	nb_explores ++ ;
@@ -136,8 +136,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             //comparaison de la longueur de la solution trouvée par l'algorithme avec celle de path
             //on convertit les deux longueurs en entiers car elles utilisent des arrondis différents
             System.out.println("La longueur avec la classe Path est la même que celle de l'algorithme : " + ((int)longueurDijkstra==(int)path.getLength()));
-    		System.out.println(path.getLength());
-    		System.out.println(longueurDijkstra);
+    		/*System.out.println(path.getLength());
+    		System.out.println(longueurDijkstra);*/
            
         }
          
@@ -147,7 +147,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         //affichage du nombre de nodes explorés
         System.out.println("Le nombre de node explorés est : " + nb_explores + " pour " + data.getGraph().size() + " node(s).");	
-       
+        System.out.println();
         return solution;
     }
 }
